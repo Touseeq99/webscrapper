@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1, h2, h3 {
+        color: #343a40;
+    }
+
+    .flash {
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .flash-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+
+    .flash-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    .form-group button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: #ffffff;
+    }
+
+    .form-group button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Table Styles */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .table th, .table td {
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        text-align: left;
+    }
+
+    .table th {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .table tbody tr:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Button Styles */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        color: #ffffff;
+        background-color: #28a745;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn:hover {
+        background-color: #218838;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    /* Additional Styles */
+    .header {
+        margin-bottom: 30px;
+    }
+
+    .header h2 {
+        margin: 0;
+        padding: 10px 0;
+        border-bottom: 2px solid #007bff;
+        color: #007bff;
+    }
+
+    .add-record {
+        margin-bottom: 20px;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #ffffff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+        background-color: #0056b3;
+    }
+    </style>
+    <title>Manage Users</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Manage Users</h1>
+        </div>
+
+        <!-- Back to Admin Panel Button -->
+        <a href="/admin" class="back-btn">Back to Admin Panel</a>
+
+        <!-- Add User Form -->
+        <div class="add-record">
+            <h2>Add User</h2>
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone_number">Phone Number:</label>
+                    <input type="text" id="phone_number" name="phone_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="add_user">Add User</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Delete User Form -->
+        <div class="add-record">
+            <h2>Delete User</h2>
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label for="user_id">User ID:</label>
+                    <input type="text" id="user_id" name="user_id" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="delete_user" class="btn btn-danger">Delete User</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- List of Users -->
+        <h2>Existing Users</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{{ user[3] }}</td>
+                    <td>{{ user[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

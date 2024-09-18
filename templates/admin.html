@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <button class="toggle-button moon" onclick="toggleDarkMode()">🌙</button>
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <ul>
+            <li><a href="{{ url_for('manage_table', table_name='block_list_url') }}">Manage Blocked Companies</a></li>
+            <li><a href="{{ url_for('manage_table', table_name='block_list_industry') }}">Manage Blocked Industries</a></li>
+            <li><a href="{{ url_for('manage_table', table_name='block_list_job') }}">Manage Job Names</a></li>
+            <li><a href="{{ url_for('manage_table', table_name='block_list_cname') }}">Manage Company Names</a></li>
+            <li><a href="{{ url_for('manage_table', table_name='block_list_size') }}">Manage Company size</a></li>
+            <li><a href="{{ url_for('manage_table', table_name='unsubscribed_emails') }}">Manage Unsubscribed Email size</a></li>
+            <li><a href="{{ url_for('manage_users', table_name='users') }}">Manage user</a></li>
+        </ul>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-button');
+            body.classList.toggle('dark-mode');
+
+            // Save the mode to local storage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                button.classList.remove('moon');
+                button.classList.add('sun');
+                button.textContent = '☀️';
+            } else {
+                localStorage.setItem('theme', 'light');
+                button.classList.remove('sun');
+                button.classList.add('moon');
+                button.textContent = '🌙';
+            }
+        }
+
+        // Load the theme from local storage
+        window.onload = function() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-button');
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+                button.classList.remove('moon');
+                button.classList.add('sun');
+                button.textContent = '☀️';
+            } else {
+                button.classList.remove('sun');
+                button.classList.add('moon');
+                button.textContent = '🌙';
+            }
+        };
+    </script>
+</body>
+</html>
