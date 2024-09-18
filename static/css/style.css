@@ -1,0 +1,169 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex; /* Center content horizontally and vertically */
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.container {
+    width: 60%; /* Reduced width */
+    max-width: 500px; /* Set a max-width for better control on large screens */
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+/* List and Links */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    margin: 20px 0; /* Increased margin for better spacing */
+}
+
+a {
+    display: block;
+    padding: 20px 25px; /* Increased padding */
+    border-radius: 5px;
+    color: #fff;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+    font-weight: 500;
+    position: relative;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Mirror effect */
+a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.3;
+    transform: scaleY(-1);
+}
+
+a:nth-child(1) {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+}
+
+a:nth-child(2) {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+a:nth-child(3) {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
+}
+
+a:nth-child(4) {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+}
+
+a:nth-child(5) {
+    background: linear-gradient(135deg, #f4c2c2, #f5a623);
+}
+
+a:nth-child(6) {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+}
+
+a:last-child {
+    display: block;
+    text-align: center;
+    padding: 20px 25px; /* Increased padding */
+    background: #e74c3c;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+a:last-child:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}
+
+a:last-child::before {
+    display: none;
+}
+
+/* Dark Mode Styles */
+.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-mode .container {
+    background-color: #1e1e1e;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode a {
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+    color: #e0e0e0;
+}
+
+.dark-mode a:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Toggle Button Styles */
+.toggle-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+    background-color: #ef5412;
+    color: white;
+    z-index: 1000;
+}
+
+.toggle-button.sun {
+    background-color: #fbc02d;
+}
+
+.toggle-button.sun:hover {
+    background-color: #f9a825;
+}
+
+.toggle-button.moon {
+    background-color: #007bff;
+}
+
+.toggle-button.moon:hover {
+    background-color: #0056b3;
+}

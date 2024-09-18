@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Page</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            transition: background-color 0.5s ease, color 0.5s ease, transform 0.3s ease;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            transition: color 0.5s ease;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 16px;
+        }
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+        input[type="file"]::file-selector-button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background-color: #45a049;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #4caf50;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        .message {
+            margin-top: 30px;
+            color: #21ce52;
+            font-size: 16px;
+            transition: color 0.5s ease;
+            background: rgba(255, 255, 255, 0.8); /* Mirror background effect */
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out; /* Animation for messages */
+        }
+        .message ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .message li {
+            margin-bottom: 10px;
+        }
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+        .dark-mode .container {
+            background: #2a2a2a;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        .dark-mode h2 {
+            color: #e0e0e0;
+        }
+        .dark-mode input[type="file"] {
+            border: 2px solid #444;
+            background-color: #333;
+            color: #e0e0e0;
+        }
+        .dark-mode input[type="file"]::file-selector-button {
+            background-color: #45a049;
+            color: white;
+        }
+        .dark-mode input[type="file"]::file-selector-button:hover {
+            background-color: #388e3c;
+        }
+        .dark-mode input[type="submit"] {
+            background-color: #45a049;
+        }
+        .dark-mode input[type="submit"]:hover {
+            background-color: #388e3c;
+        }
+        .toggle-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            background-color: #4caf50;
+            color: white;
+        }
+        .toggle-button.sun {
+            background-color: #fbc02d;
+        }
+        .toggle-button.sun:hover {
+            background-color: #f9a825;
+        }
+        .toggle-button.moon {
+            background-color: #4caf50;
+        }
+        .toggle-button.moon:hover {
+            background-color: #45a049;
+        }
+        .nav-button, .logout-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2ed917;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none; /* Remove underline */
+        }
+        .nav-button:hover, .logout-button:hover {
+            background-color: #d32f2f;
+            transform: scale(1.05);
+        }
+        .nav-button {
+            background-color: #007bff;
+        }
+        .nav-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-button moon" onclick="toggleDarkMode()">🌙</button>
+    <div class="container">
+        <h2>Upload Email CSV for Processing</h2>
+        <form action="{{ url_for('upload_email_file') }}" method="POST" enctype="multipart/form-data">
+            <label for="file">Choose CSV File:</label>
+            <input type="file" id="file" name="file" required><br><br>
+            <input type="submit" value="Sent Email">
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="message">
+              <ul>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
+        <a href="{{ url_for('index') }}" class="nav-button">Back to Main Page</a>
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-button');
+            body.classList.toggle('dark-mode');
+
+            // Save the mode to local storage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                button.classList.remove('moon');
+                button.classList.add('sun');
+                button.textContent = '☀️';
+            } else {
+                localStorage.setItem('theme', 'light');
+                button.classList.remove('sun');
+                button.classList.add('moon');
+                button.textContent = '🌙';
+            }
+        }
+
+        // Load the theme from local storage
+        window.onload = function() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-button');
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+                button.classList.remove('moon');
+                button.classList.add('sun');
+                button.textContent = '☀️';
+            } else {
+                button.classList.remove('sun');
+                button.classList.add('moon');
+                button.textContent = '🌙';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 350px;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative; /* Added for toggle button positioning */
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input[type="submit"],
+        .signup-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-bottom: 15px; /* Ensure consistent spacing between buttons */
+            box-sizing: border-box; /* Ensure proper box sizing */
+            text-align: center; /* Center text in the button */
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+            transform: scale(1.02);
+        }
+        .signup-button {
+            background-color: #28a745;
+            color: white;
+            text-decoration: none; /* Remove underline from link */
+        }
+        .signup-button:hover {
+            background-color: #218838;
+            transform: scale(1.02);
+        }
+        .message {
+            margin-top: 15px;
+            color: red;
+            text-align: center;
+            font-size: 14px;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode .container {
+            background: #1e1e1e;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .dark-mode input[type="text"],
+        .dark-mode input[type="password"] {
+            border: 1px solid #333;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+        }
+        .dark-mode input[type="submit"],
+        .dark-mode .signup-button {
+            background-color: #0056b3;
+        }
+        .dark-mode input[type="submit"]:hover,
+        .dark-mode .signup-button:hover {
+            background-color: #003d7a;
+        }
+        .toggle-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            background-color: #007bff;
+            color: white;
+        }
+        .toggle-button.sun {
+            background-color: #fbc02d;
+        }
+        .toggle-button.sun:hover {
+            background-color: #f9a825;
+        }
+        .toggle-button.moon {
+            background-color: #007bff;
+        }
+        .toggle-button.moon:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-button moon" onclick="toggleDarkMode()">🌙</button>
+    <div class="container">
+        <h2>Login to Seamless.AI Tool</h2>
+        <form action="{{ url_for('login') }}" method="POST">
+            <label for="username">Email:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <input type="submit" value="Login">
+        </form>
+        <a class="signup-button" href="{{ url_for('signup') }}">Sign up</a>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="message">
+              <ul>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-button');
+            body.classList.toggle('dark-mode');
+
+            // Save the mode to local storage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                button.classList.remove('moon');
+                button.classList.add('sun');
+                button.textContent = '☀️';
+            } else {
+                localStorage.setItem('theme', 'light');
+                button.classList.remove('sun');
+                button.classList.add('moon');
+                button.textContent = '🌙';
+            }
+        }
+
+        // Load the theme from local storage
+        window.onload = function() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-button');
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+                button.classList.remove('moon');
+                button.classList.add('sun');
+                button.textContent = '☀️';
+            } else {
+                button.classList.remove('sun');
+                button.classList.add('moon');
+                button.textContent = '🌙';
+            }
+        };
+    </script>
+</body>
+</html>

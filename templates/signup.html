@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Signup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Signup</h1>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('signup') }}">
+            <div class="form-grid">
+                <div class="form-column">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+
+                    <label for="phone_number">Phone Number:</label>
+                    <input type="text" id="phone_number" name="phone_number">
+                </div>
+                <div class="form-column">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+
+                    <label for="seamless_email">Seamless Email:</label>
+                    <input type="email" id="seamless_email" name="seamless_email">
+
+                    <label for="seamless_password">Seamless Password:</label>
+                    <input type="password" id="seamless_password" name="seamless_password">
+
+                    <label for="office_position">Office Position:</label>
+                    <input type="text" id="office_position" name="office_position">
+                </div>
+            </div>
+
+            <input type="submit" value="Sign Up">
+        </form>
+        <a href="{{ url_for('login') }}">Already have an account? Log in</a>
+    </div>
+</body>
+</html>
