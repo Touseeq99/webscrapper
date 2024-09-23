@@ -73,7 +73,13 @@ def validate_rows(df, conn):
 def initialize_driver():
     print("Initializing Selenium WebDriver...")
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')  # Uncomment to run in headless mode (no UI)
+    options.add_argument('--headless')
+    options.add_argument("--no-sandbox")  # Required in some environments like Heroku
+    options.add_argument("--disable-dev-shm-usage")  # Prevents crashes due to shared memory
+    options.add_argument("--disable-extensions")  # Disable extensions to reduce memory usage
+    options.add_argument("--disable-infobars")  # Disable infobars
+    options.add_argument("--disable-popup-blocking")  # Disable popup blocking for seamless browsing
+    options.add_argument("--remote-debugging-port=9222")
 
     # Set up the ChromeDriver using WebDriver Manager
     driver = webdriver.Chrome(
