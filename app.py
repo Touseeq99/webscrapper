@@ -10,11 +10,8 @@ import glob
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey99'  # Replace with a real secret key
-folders = os.path.join(f"C:/Projectscrappersfolders")
-if not os.path.exists(folders):
-            os.makedirs(folders)
-# Configure file upload
-UPLOAD_FOLDER = 'C:/Projectscrappersfolders/uploads'
+
+UPLOAD_FOLDER = '/tmp/uploads'
 ALLOWED_EXTENSIONS = {'csv' , 'xlsx'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -115,7 +112,7 @@ def upload_file():
         username = session.get('username')  # Fetch the username from session
 
         # Create a user-specific output folder
-        user_output_folder = os.path.join(f"C:/Projectscrappersfolders/{username}_output_folder")
+        user_output_folder = os.path.join(f"/tmp/{username}_output_folder")
         if not os.path.exists(user_output_folder):
             os.makedirs(user_output_folder)
         else:
