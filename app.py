@@ -1,16 +1,21 @@
 import sys
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask,  render_template, request, redirect, url_for, session, flash
 import os
 from werkzeug.utils import secure_filename
 import subprocess
 import psycopg2  # PostgreSQL library
+from flask import send_file
+import shutil
+import glob
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey99'  # Replace with a real secret key
-
+folders = os.path.join(f"C:/Projectscrappersfolders")
+if not os.path.exists(folders):
+            os.makedirs(folders)
 # Configure file upload
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'csv'}
+UPLOAD_FOLDER = 'C:/Projectscrappersfolders/uploads'
+ALLOWED_EXTENSIONS = {'csv' , 'xlsx'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -68,6 +73,26 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('login'))
 
+
+
+
+
+def clear_folder(folder_path):
+    """
+    Clears all files in the specified folder.
+    """
+    if os.path.exists(folder_path):
+        # Remove all files in the folder
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)  # Remove the file or link
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)  # Remove the directory
+            except Exception as e:
+                print(f'Failed to delete {file_path}. Reason: {e}')
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -84,16 +109,39 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Fetch seamless credentials from session
+        # Fetch seamless credentials and username from session
         seamless_email = session.get('seamless_email')
         seamless_password = session.get('seamless_password')
+        username = session.get('username')  # Fetch the username from session
+
+        # Create a user-specific output folder
+        user_output_folder = os.path.join(f"C:/Projectscrappersfolders/{username}_output_folder")
+        if not os.path.exists(user_output_folder):
+            os.makedirs(user_output_folder)
+        else:
+            # Clear the folder if it already exists
+            clear_folder(user_output_folder)
 
         try:
             # Use sys.executable to ensure the correct Python version is used
-            result = subprocess.run([sys.executable, 'scripts.py', file_path, seamless_email, seamless_password], text=True, check=True)
+            result = subprocess.run([sys.executable, 'scripts.py', file_path, seamless_email, seamless_password, username], text=True, check=True)
             output = result.stdout
             flash('File processed successfully')
             print(output)
+
+            # Find the latest .xlsx file in the user-specific output folder
+            list_of_files = glob.glob(os.path.join(user_output_folder, '*.xlsx'))
+            if not list_of_files:
+                flash('No XLSX file found in the user output folder.')
+                return redirect(url_for('index'))
+
+            latest_file = max(list_of_files, key=os.path.getctime)  # Get the latest file by creation time
+
+            # Serve the file for download
+            response = send_file(latest_file, as_attachment=True, download_name=os.path.basename(latest_file))
+
+            return response
+
         except subprocess.CalledProcessError as e:
             error = e.stderr
             flash(f'Error: {error}')

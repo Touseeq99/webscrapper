@@ -107,8 +107,8 @@ def extract_contact_info(row):
         print(f"Error while processing contact information: {e}")
         return "Error", "Error", "Error"
 
-def process_company_url(url, email, password, job_name, location , company_name ):
-    print(f"Processing company URL: {url}")
+def process_company_urls_in_batch(urls, email, password, job_names, locations, company_names):
+    print(f"Processing company URLs in batch: {len(urls)} companies.")
     driver = initialize_driver()
     try:
         driver.maximize_window()
@@ -142,58 +142,34 @@ def process_company_url(url, email, password, job_name, location , company_name 
         login_button.click()
         print("Clicked login button.")
 
-        # Wait for login to succeed (check for URL change or certain element presence)
+        # Wait for login to succeed
         WebDriverWait(driver, 50).until(EC.url_changes("https://login.seamless.ai/"))
         print("Login successful.")
 
-        # Store cookies after login
         cookies = driver.get_cookies()
         print(f"Stored cookies: {cookies}")
 
-        # Navigate to the desired page using the company URL
-        search_url = f"https://login.seamless.ai/search/contacts?page=1&companies={url}&industries=-Insurance|-Banking|-Government%25%20Administration|-Airlines%25%20Aviation&locations=United%20States%20of%20America&titles=Human%25%20Resource|HR|Talent|Recruiter|President|Founder|Owner|CEO"
-        driver.get(search_url)
-        print(f"Navigated to search URL: {search_url}")
+        # Process each URL in the batch
+        all_results = []
+        for url, job_name, location, company_name in zip(urls, job_names, locations, company_names):
+            try:
+                print(f"Processing URL: {url} for {company_name}")
+                search_url = f"https://login.seamless.ai/search/contacts?page=1&companies={url}&industries=-Insurance|-Banking|-Government%25%20Administration|-Airlines%25%20Aviation&locations=United%20States%20of%20America&titles=Human%25%20Resource|HR|Talent|Recruiter|President|Founder|Owner|CEO"
+                driver.get(search_url)
+                print(f"Navigated to search URL: {search_url}")
 
-        # Add cookies to the session
-        for cookie in cookies:
-            driver.add_cookie(cookie)
-        driver.refresh()  # Refresh after adding cookies to ensure session is active
-        print("Cookies added, page refreshed.")
-
-        WebDriverWait(driver, 50).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'table.Table__StyledTable-bEWGVx.iWWlUt'))
-        )
-        print("Page loaded with search results.")
-
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
-
-        table = soup.find('table', class_='Table__StyledTable-bEWGVx iWWlUt')
-        results = []
-        if table:
-            tbody = table.find('tbody', role='rowgroup')
-            if tbody:
-                rows = tbody.find_all('tr', role='row')
-
-                for i, row in enumerate(rows[:5]):
-                    print(f"Processing row {i+1}...")
-
-                    # Find and click the 'Find contact information' button
-                    find_button = row.find('button', class_='Button__StyledButton-QGODF iIMTsb FindLockedValueButton__StyledButton-dMKDVR gRuMwN rs-btn rs-btn-ghost')
-                    if find_button:
-                        find_button_element = WebDriverWait(driver, 60).until(
-                            EC.element_to_be_clickable((By.XPATH, ".//button[contains(@class, 'FindLockedValueButton__StyledButton-dMKDVR')]"))
-                        )
-                        find_button_element.click()
-                        print(f"Clicked 'Find contact' button in row {i+1}.")
-                        time.sleep(20)
-
+                # Add cookies to the session and refresh
+                for cookie in cookies:
+                    driver.add_cookie(cookie)
                 driver.refresh()
-                time.sleep(20)
-                print("Page refreshed.")
+                print("Cookies added, page refreshed.")
 
-                # Extract contact info after refresh
+                WebDriverWait(driver, 50).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'table.Table__StyledTable-bEWGVx.iWWlUt'))
+                )
+                print("Page loaded with search results.")
+
+                # Extract contact information
                 page_source = driver.page_source
                 soup = BeautifulSoup(page_source, 'html.parser')
                 table = soup.find('table', class_='Table__StyledTable-bEWGVx iWWlUt')
@@ -201,24 +177,22 @@ def process_company_url(url, email, password, job_name, location , company_name 
                     tbody = table.find('tbody', role='rowgroup')
                     if tbody:
                         rows = tbody.find_all('tr', role='row')
-                        for i, row in enumerate(rows[:5]):
+                        for row in rows[:5]:
                             name, position, email = extract_contact_info(row)
-                            # Add the job_name and location for each result
-                            results.append([url, name, position, email, job_name, location , company_name ])
-                            print(f"Extracted info from row {i+1} - Name: {name}, Position: {position}, Email: {email}, Job: {job_name}, Location: {location}")
-
-        return results
-    except Exception as e:
-        print(f"Error: {e}")
-        return []
+                            all_results.append([url, name, position, email, job_name, location, company_name])
+                            print(f"Extracted info - Name: {name}, Position: {position}, Email: {email}")
+            except Exception as e:
+                print(f"Error processing {url}: {e}")
+        
+        return all_results
     finally:
         driver.quit()
-        print("Browser closed.")
+        print("Browser closed after batch processing.")
 
 
-def main(input_file):
+def main(input_file, username):
     # Generate a timestamp for file names
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d")
     
     print(f"Reading input file: {input_file}")
     df = pl.read_csv(input_file, raise_if_empty=False)
@@ -237,54 +211,56 @@ def main(input_file):
     conn.close()
     print("Database connection closed.")
 
-    # Determine the path to the Downloads folder
-    downloads_folder = Path(os.path.expanduser("~/Downloads"))
-
     if valid_rows:
-        print("Processing valid rows...")
+        print("Processing valid rows in batches...")
         valid_df = pl.DataFrame(valid_rows)
-        company_websites = valid_df['Company_Website']
-        job_names = valid_df['Job_Name']
-        locations = valid_df['Job_Location']
-        company_name = valid_df['Company_Name']
-        print(company_name)
-        all_results = []
-        for company_url, job_name, location, company_name in zip(company_websites, job_names, locations, company_name):
-            print(f"Processing URL: {company_url} with Job: {job_name} and Location: {location}")
-            results = process_company_url(company_url, email, password, job_name, location, company_name)
-            all_results.extend(results)
+        company_websites = valid_df['Company_Website'].to_list()
+        job_names = valid_df['Job_Name'].to_list()
+        locations = valid_df['Job_Location'].to_list()
+        company_names = valid_df['Company_Name'].to_list()
 
-        # Save the scraped data to a CSV file with timestamp in the Downloads folder
+        all_results = []
+        batch_size = 30  # Process 30 rows at a time
+        for i in range(0, len(company_websites), batch_size):
+            batch_urls = company_websites[i:i+batch_size]
+            batch_job_names = job_names[i:i+batch_size]
+            batch_locations = locations[i:i+batch_size]
+            batch_company_names = company_names[i:i+batch_size]
+            
+            # Process the current batch of URLs
+            print(f"Processing batch {i//batch_size + 1}...")
+            batch_results = process_company_urls_in_batch(batch_urls, email, password, batch_job_names, batch_locations, batch_company_names)
+            all_results.extend(batch_results)
+
         if all_results:
-            output_filename = downloads_folder / f"output_{timestamp}.csv"
+            uploads_folder = Path(os.path.abspath(f"C:/Projectscrappersfolders/{username}_output_folder"))
+            uploads_folder.mkdir(parents=True, exist_ok=True)  # Create if it doesn't exist
+
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_filename = uploads_folder / f"{username}_output_{timestamp}.xlsx"
+
             print(f"Saving {len(all_results)} results to {output_filename}...")
             output_df = pl.DataFrame(all_results, schema=["url", "name", "position", "email", "job_name", "location", "company Name"])
-            output_df.write_csv(output_filename)
+
+            # Write to Excel
+            output_df.write_excel(output_filename)
             print(f"Scraped data saved to {output_filename}")
+            return str(output_filename)  # Return the file path
         else:
             print("No results were found.")
+            return None
 
-    if invalid_rows:
-        # Save the invalid rows to an Excel file with a timestamp in the Downloads folder
-        invalid_filename = downloads_folder / f"invalid_GD_Jobs_Octoparse_AM_{timestamp}.xlsx"
-        print(f"Saving {len(invalid_rows)} invalid rows to {invalid_filename}...")
-        invalid_df = pl.DataFrame(invalid_rows)
-        invalid_df.write_excel(invalid_filename)
-        print(f"Invalid data saved to {invalid_filename}")
-# inputs = "company_testing.csv"
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
         print("Usage: script.py <input_file> <email> <password>")
         sys.exit(1)
 
     input_file = sys.argv[1]
     email = sys.argv[2]
     password = sys.argv[3]
+    username = sys.argv[4]
  
     print(f"Starting script with input file: {input_file}")
-    main(input_file)
-
-
-
-    
+    main(input_file , username)

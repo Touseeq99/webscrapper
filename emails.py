@@ -130,7 +130,7 @@ def main(file_path, username, email, phone_number, office_position):
         return
 
     # Read input file using Polars
-    df = pl.read_csv(file_path)
+    df = pl.read_excel(file_path)
     
     # Database connection
     conn = get_db_connection()
