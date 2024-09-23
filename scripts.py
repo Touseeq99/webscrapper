@@ -233,7 +233,7 @@ def main(input_file, username):
             all_results.extend(batch_results)
 
         if all_results:
-            uploads_folder = Path(os.path.abspath(f"C:/Projectscrappersfolders/{username}_output_folder"))
+            uploads_folder = Path(os.path.abspath(f"/tmp/{username}_output_folder"))
             uploads_folder.mkdir(parents=True, exist_ok=True)  # Create if it doesn't exist
 
             # Create a timestamp for the filename
